@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Stack;
 
 public class LeetCode3 {
 	
@@ -458,9 +459,258 @@ public class LeetCode3 {
         return table[s.length()];
     }
     
+    /* 68. Text Justification
+     * 讲单词组成行，每行最大长度位maxWidth，
+     * 两个单词之间必须有空格，同一行的空格要均匀分布，多的空格优先分配给左边的间隔
+     * 最后一行要左对齐，最右必须是空格。
+     * */
+    public List<String> fullJustify(String[] words, int maxWidth) {
+        int i,j,k,t,n = words.length;
+        List<String> res = new ArrayList<>();
+        int cur = 0,left;
+        i = 0;
+        while(i<n){
+            j = i;
+            for(;j<n;j++)
+                if(cur<maxWidth)
+                    cur += words[j].length()+1;
+                else
+                    break;
+            if(cur>maxWidth+1){
+                cur -= words[j].length()+1;
+            }else{
+                cur--;
+                j++;
+            }
+            left = maxWidth-cur;
+            String tmp = "";
+            if(j==n){
+                for(k=i;k<j-1;k++)
+                    tmp += words[k]+" ";
+                tmp += words[k];
+                for(k=0;k<left;k++)
+                    tmp += " ";
+                res.add(tmp);
+                return res;
+            }else{
+                for(k=i;k<j-1;k++){
+                    tmp += words[k]+" ";
+                    if(k-i<left%(j-i-1)){
+                        for(t=0;t<left/(j-i-1)+1;t++)
+                            tmp += " ";
+                    }
+                    else{
+                        for(t=0;t<left/(j-i-1);t++)
+                            tmp += " ";
+                    }
+                    tmp += words[k];
+                    res.add(tmp);
+                }
+            }
+            i = j;
+        }
+        return res;
+        
+    }
+    
+    /*221. Maximal Square
+     * 最大正方形
+     * 给定一个2D的矩阵，由‘0’和‘1’组成
+     * 找到最大的子方阵，使得它的面积最大
+     * 动态规划
+     * */
+    public int maximalSquare(char[][] matrix) {
+        int m = matrix.length;
+        if(m<=0)
+            return 0;
+        int n = matrix[0].length;
+        int i,j;
+        int max[][] = new int[m][n];
+        int x,mm = 0;;
+        for(i=0;i<m;i++){
+            max[i][0] = matrix[i][0]-'0';
+            if(max[i][0]>mm)
+                mm = max[i][0];
+        }
+            
+        for(j=0;j<n;j++){
+            max[0][j] = matrix[0][j]-'0';
+            if(max[0][j]>mm)
+                mm = max[0][j];
+        }
+            
+        for(i=1;i<m;i++)
+            for(j=1;j<n;j++)
+                if(matrix[i][j]=='0')
+                    max[i][j] = 0;
+                else{
+                    x = max[i-1][j-1];
+                    if(max[i-1][j]<x)
+                        x = max[i-1][j];
+                    if(max[i][j-1]<x)
+                        x = max[i][j-1];
+                    if(x>=mm)
+                        mm = x+1;
+                    max[i][j] = x+1;
+                }
+        return mm*mm;
+    }
+    
+    /*85. Maximal Rectangle
+     * 最大矩形
+     * 给定一个2D矩阵，由‘0’和‘1’组成
+     * 找到面积最大的矩形，由1组成
+     * 方法，到第i行的高度算出来，然后计算这个高度的最大面积
+     * */
+    public int maxA(int[] A){
+        int n = A.length;
+        if(n<=0) return 0;
+        Stack<Integer> stack = new Stack<>();
+        int i,h,s;
+        int maxArea = 0;
+        for(i=0;i<=n;i++){
+            if(i<n)
+                h = A[i];
+            else
+                h = 0;
+            if(stack.isEmpty() || h>=A[stack.peek()])
+                stack.push(i);
+            else{
+                int tp = stack.pop();
+                if(stack.isEmpty())
+                    s = A[tp] * i;
+                else
+                    s = A[tp] * (i-1-stack.peek());
+                if(s>maxArea)
+                    maxArea = s;
+                i--;
+            }
+                
+        }
+        return maxArea;
+    }
+    public int maximalRectangle(char[][] matrix) {
+        int m = matrix.length;
+        if(m<=0)
+            return 0;
+        int n = matrix[0].length;
+        int t[] = new int[n];
+        int maxArea = 0,x,i,j;
+        x = 0;
+        for(j=0;j<n;j++){
+            t[j] = matrix[0][j]-'0';
+        }
+        maxArea = maxA(t);
+        for(i=1;i<m;i++){
+            for(j=0;j<n;j++)
+                if(matrix[i][j]=='0')
+                    t[j] = 0;
+                else
+                    t[j]++;
+            x = maxA(t);
+            if(x>maxArea)
+                maxArea = x;
+        }
+        return maxArea;
+    }
+    
+    /* 84. Largest Rectangle in Histogram
+     * 给定一个n个非负数组，求直方图中最大的矩形
+     * 方法：从左往右扫描，找到左边第一个比当前位置小的数的位置
+     * 从右往左扫描，找到右边第一个比当前位置小的数的位置
+     * */
+    public int largestRectangleArea(int[] heights) {
+        int i,j;
+        int n = heights.length;
+        if(n==0)
+            return 0;
+        if(n==1)
+            return heights[0];
+        int left[] = new int[n];
+        int right[] = new int[n];
+        left[0] = -1;
+        for(i=1;i<n;i++)
+            if(heights[i]>heights[i-1])
+                left[i] = i-1;
+            else if(heights[i]==heights[i-1])
+                left[i] = left[i-1];
+            else{
+                j = left[i-1];
+                while(j!=-1 && heights[i]<=heights[j]) j = left[j];
+                left[i] = j;                
+            }
+        right[n-1] = n;
+        for(i=n-2;i>=0;i--)
+            if(heights[i]>heights[i+1])
+                right[i] = i+1;
+            else if(heights[i]==heights[i+1])
+                right[i] = right[i+1];
+            else{
+                j = right[i+1];
+                while(j!=n && heights[i]<=heights[j]) j = right[j];
+                right[i] = j;
+            }
+        int maxArea = 0;
+        for(i=0;i<n;i++)
+            maxArea = Math.max(maxArea,heights[i]*(right[i]-left[i]-1));
+        return maxArea;
+    }
+    
+    /* 228. Summary Ranges
+     * 把有序数组转换成范围形式
+     * 即：连续的整数转换成最小->最大
+     * */
+    public List<String> summaryRanges(int[] nums) {
+        List<String> res = new ArrayList<>();
+        int n = nums.length;
+        String tmp;
+        if(n==0)
+            return res;
+        if(n==1){
+            tmp = nums[0]+"";
+            res.add(tmp);
+            return res;
+        }
+        int i,j;
+        i = 0;
+        while(i<n){
+            j = i+1;
+            while(j!=n && nums[j]==nums[j-1]+1) j++;
+            tmp = ""+nums[j-1];
+            if(j-i>1)
+                tmp = nums[i]+"->"+tmp;
+            res.add(tmp);
+            i = j;
+        }
+        return res;
+    }
+    
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		LeetCode3 test = new LeetCode3();
+		String tmpsss = 1+"";
+		System.out.println(tmpsss);
+		
+		
+		int heights[] = {0,1,0,2,1,0,1,3,2,1,2,1};
+			//{1,2,2};
+		System.out.println(test.largestRectangleArea(heights));
+		
+		char matrixxxx[][] = {
+			{'1','0','1','0','0'},
+			{'1','0','1','1','1'},
+			{'1','1','1','1','1'},
+			{'1','0','0','1','0'}};
+		System.out.println(test.maximalRectangle(matrixxxx));
+		
+		
+		String words[] = {"This", "is", "an", "example", "of", "text", 
+				"justification."};
+		List<String> resss = test.fullJustify(words, 16);
+		for(String ss:resss) 
+			System.out.println(ss);
+		
+		
 		List<String> wordDict = new ArrayList<>();
 		wordDict.add("leet");
 		wordDict.add("code");
