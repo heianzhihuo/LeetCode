@@ -431,6 +431,97 @@ public class LeetCode4 {
         return res;
     }
     
+    
+	/*632. Smallest Range
+	 * 给了k个数组，找到最小的范围，每个数组都至少存在一个数在这个范围内
+	 * [a,b]<[c,d] if b-a<d-c || a<c if b-a==d-c
+	 * */
+    public int[] smallestRange(List<List<Integer>> nums) {
+    	class Map{
+            List<Integer> queue;
+            int q = 0;
+            public Map(List<Integer> q){
+                queue = q;
+            }
+            public boolean isEmpty(){
+                if(queue==null || queue.size()==q)
+                    return true;
+                return false;
+            }
+            public int get(){
+                return queue.get(q);
+            }
+                
+        }
+        Comparator<Map> comparator = new Comparator<Map>() {
+    		@Override
+    		public int compare(Map q1, Map q2) {
+    			if(q1.isEmpty() && q2.isEmpty())
+                    return 0;
+                if(q1.isEmpty())
+                    return 1;
+                if(q2.isEmpty())
+                    return -1;
+                if(q1.get()==q2.get())
+                    return 0;
+                if(q1.get()>q2.get())
+                    return 1;
+                return -1;
+    		}
+    	};
+        int res[] = new int[2];
+        int a = Integer.MAX_VALUE,b=Integer.MIN_VALUE,min = Integer.MAX_VALUE;
+        PriorityQueue<Map> pq = new PriorityQueue<>(comparator);
+        int i;
+        for(i=0;i<nums.size();i++){
+            Map tmp = new Map(nums.get(i));
+            if(!tmp.isEmpty()){
+                if(tmp.get()>b)
+                    b = tmp.get();
+                if(tmp.get()<a)
+                    a = tmp.get();
+                pq.add(tmp);
+            }
+        }
+        res[0] = a;
+        res[1] = b;
+        min = b-a;
+        while(pq.size()==nums.size()){
+            Map tmp = pq.poll();
+            a = tmp.get();
+            if(b-a<min){
+                min = b-a;
+                res[0] = a;
+                res[1] = b;
+            }
+            tmp.q++;
+            if(!tmp.isEmpty()){
+                if(tmp.get()>b)
+                    b = tmp.get();
+                pq.add(tmp);
+            }
+                
+        }
+        return res;
+    }
+    
+    /* 303. Range Sum Query - Immutable
+     * 给定一个数组nums，求nums[i..j]的和
+     * */
+    class NumArray {
+        int []sums;
+        public NumArray(int[] nums) {
+            sums = new int[nums.length+1];
+            int i;
+            for(i=0;i<nums.length;i++)
+                sums[i+1] = sums[i]+nums[i];
+        }
+        
+        public int sumRange(int i, int j) {
+            return sums[j+1]-sums[i];
+        }
+    }
+    
     public static void main(String[] args) {
         LeetCode4 test = new LeetCode4();
     	int A[] = {2147483647,2147483647,2147483647,2147483647,2147483647,2147483647};
