@@ -522,6 +522,61 @@ public class LeetCode4 {
         }
     }
     
+    /* 938. Range Sum of BST
+     * 求搜索二叉树节点值在L和R范围内所有节点的值的和
+     * 无相同值的节点
+     * */
+    public int rangeSumBST(TreeNode root, int L, int R) {
+        if(root==null)
+            return 0;
+        if(root.val<L)
+            return rangeSumBST(root.right,L,R);
+        if(root.val>R)
+            return rangeSumBST(root.left,L,R);
+        return rangeSumBST(root.right,L,R)+rangeSumBST(root.left,L,R)+root.val;
+    }
+    
+    /* 101. Symmetric Tree
+     * 判断一棵二叉树是否是对称二叉树*/
+    public boolean isSymmetric(TreeNode root) {
+        if(root==null)
+            return true;
+        return isSymmetric(root.left,root.right);
+    }
+    public boolean isSymmetric(TreeNode root1,TreeNode root2){
+        if(root1==null && root2==null)
+            return true;
+        if(root1==null || root2==null)
+            return false;
+        if(root1.val!=root2.val)
+            return false;
+        return isSymmetric(root1.left,root2.right) && isSymmetric(root1.right,root2.left);
+    }
+    /* 965. Univalued Binary Tree
+     * 判断一棵二叉树中是否所有节点的值相等*/
+    public boolean isUnivalTree(TreeNode root) {
+        if(root==null)
+            return true;
+        if(root.left!=null && root.val!=root.left.val)
+            return false;
+        if(root.right!=null && root.val!=root.right.val)
+            return false;
+        return isUnivalTree(root.left) && isUnivalTree(root.right);
+    }
+    /*110. Balanced Binary Tree
+     * 判断一棵二叉树是否是平衡二叉树*/
+    public boolean isBalanced(TreeNode root) {
+        if(root==null) return true;
+        if(Math.abs(height(root.left)-height(root.right))>1)
+            return false;
+        return isBalanced(root.left) && isBalanced(root.right);
+    }
+    public int height(TreeNode root){
+        if(root==null)
+            return 0;
+        return Math.max(height(root.left),height(root.right))+1;
+    }
+    
     public static void main(String[] args) {
         LeetCode4 test = new LeetCode4();
     	int A[] = {2147483647,2147483647,2147483647,2147483647,2147483647,2147483647};
