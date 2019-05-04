@@ -577,9 +577,148 @@ public class LeetCode4 {
         return Math.max(height(root.left),height(root.right))+1;
     }
     
+    /*106. Construct Binary Tree from Inorder and Postorder Traversal
+     * 从中序和后序遍历序列生成二叉树*/
+    int postindex,inindex;
+    public TreeNode buildTree(int[] inorder, int[] postorder) {
+        postindex = postorder.length-1;
+        inindex = postorder.length-1;
+        return buildTree(inorder,postorder,Integer.MAX_VALUE);
+    }
+    
+    public TreeNode buildTree(int[] inorder, int[] postorder,int rootVal) {
+        if(postindex==-1 || inorder[inindex]==rootVal)
+            return null;
+        TreeNode root = new TreeNode(postorder[postindex]);
+        postindex--;
+        root.right = buildTree(inorder,postorder,root.val);
+        inindex--;
+        root.left = buildTree(inorder,postorder,rootVal);
+        return root;
+    }
+    
+    /*105. Construct Binary Tree from Preorder and Inorder Traversal
+     * 从中序和先序遍历序列生成二叉树*/
+    int in,pre;
+    public TreeNode buildTree1(int[] preorder, int[] inorder) {
+        in = 0;pre = 0;
+        return buildTree1(preorder,inorder,Integer.MAX_VALUE);
+    }
+    
+    public TreeNode buildTree1(int[] preorder,int []inorder,int rootVal){
+        if(pre==preorder.length || inorder[in]==rootVal)
+            return null;
+        TreeNode root = new TreeNode(preorder[pre]);
+        pre++;
+        root.left = buildTree1(preorder,inorder,root.val);
+        in++;
+        root.right = buildTree1(preorder,inorder,rootVal);
+        return root;
+    }
+    /*1028. Recover a Tree From Preorder Traversal
+     * 从先序遍历序列回复二叉树
+     * 数字前的破折号数目表示这个节点的深度
+     * */
+    public TreeNode recoverFromPreorder(String S) {
+        if(S==null || S.length()==0)
+            return null;
+        int i = 0,k,d,val = 0;
+        int n = S.length();
+        for(;i<n && S.charAt(i)!='-';i++) val = val*10+S.charAt(i)-'0';
+        TreeNode root = new TreeNode(val);
+        TreeNode seq[] = new TreeNode[1000];
+        seq[0] = root;
+        k = 1;
+        while(i<n){
+            d = 0;
+            for(;i<n && S.charAt(i)=='-';i++) d++;
+            val = 0;
+            for(;i<n && S.charAt(i)!='-';i++) val = val*10+(S.charAt(i)-'0');
+            TreeNode tmp = new TreeNode(val);
+            if(d<k)
+                seq[d-1].right = tmp;
+            else
+                seq[k-1].left = tmp;
+            seq[d] = tmp;
+            k = d+1;
+        }
+        return root;
+    }
+    
+    
+    
+    boolean matrix[][];
+    boolean visited[];
+    int n;
+    public boolean possibleBipartition(int N, int[][] dislikes) {
+        visited = new boolean[N];
+        matrix = new boolean[N][N];
+        int i;
+        n = N;
+        for(i=0;i<dislikes.length;i++){
+            matrix[dislikes[i][0]-1][dislikes[i][1]-1] = true;
+            matrix[dislikes[i][1]-1][dislikes[i][0]-1] = true;
+        }
+        for(i=0;i<n;i++)
+            if(!visited[i] && visit(Integer.MAX_VALUE,i))
+                return false;
+        return true;
+    }
+    
+    public boolean visit(int pre,int x){
+        if(visited[x])
+            return true;
+        visited[x] = true;
+        for(int i=0;i<n;i++)
+            if(matrix[x][i] && i!=x && i!=pre && visit(x,i))
+                return true;
+        return false;
+    }
+    
+    /*215. Kth Largest Element in an Array
+     * 寻找数组中第k大的数*/
+    public int findKthLargest(int[] nums, int k) {
+        return findKthLargest(nums,nums.length-k+1,0,nums.length-1);
+    }
+    public int findKthLargest(int[] nums,int k,int i,int j){
+        if(i==j)
+    		return nums[i];
+        if(i<j){
+            int mid = rand_partition(nums,i,j);
+            if(mid-i+1==k) return nums[mid];
+            if(mid-i+1<k)
+                return findKthLargest(nums,k-mid+i-1,mid+1,j);
+            return findKthLargest(nums,k,i,mid-1);
+        }
+        return 0;
+    }
+    public int rand_partition(int[] nums,int i,int j){
+        int k = (int)(Math.random()*(j-i+1))+i;
+        int x = nums[k];
+        nums[k] = nums[i];
+        while(i<j){
+            while(i<j && x<=nums[j]) j--;
+            if(i<j) nums[i] = nums[j];
+            while(i<j && x>nums[i]) i++;
+            if(i<j) nums[j] = nums[i];
+        }
+        nums[i] = x;
+        return i;
+    }
+    
     public static void main(String[] args) {
         LeetCode4 test = new LeetCode4();
-    	int A[] = {2147483647,2147483647,2147483647,2147483647,2147483647,2147483647};
+    	int nums[] = {3,2,1,5,6,4};
+    	System.out.println(test.findKthLargest(nums, 2));
+        
+    	
+    	for(int x:nums)
+    		System.out.println(x);
+    	
+        int dislikes[][] = {{1,2},{1,3},{2,4}};
+        System.out.println(test.possibleBipartition(4, dislikes));
+        
+        int A[] = {2147483647,2147483647,2147483647,2147483647,2147483647,2147483647};
     	System.out.println(test.reversePairs(A));
     	for(int x:A)
     		System.out.println(x);
