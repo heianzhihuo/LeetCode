@@ -705,9 +705,189 @@ public class LeetCode4 {
         nums[i] = x;
         return i;
     }
-    
+    /*680. Valid Palindrome II
+     * 判断一个字符串在至多删除一个字符后，是否是回文串*/
+    public boolean validPalindrome(String s) {
+        if(s.length()<=2)
+            return true;
+        int i = 0,j = s.length()-1;
+        while(i<j && s.charAt(i)==s.charAt(j)){
+            i++;
+            j--;
+        }
+        if(i>=j)
+            return true;
+        int a = i,b = j-1;
+        while(a<b && s.charAt(a)==s.charAt(b)){
+            a++;
+            b--;
+        }
+        if(a>=b)
+            return true;
+        a = i+1;b = j;
+        while(a<b && s.charAt(a)==s.charAt(b)){
+            a++;
+            b--;
+        }
+        if(a>=b)
+            return true;
+        return false;            
+    }
+    /*125. Valid Palindrome
+     * 判定一个字符串是否为回文串，无视非字母和数字字符
+     * 且无视大小写*/
+    public boolean isPalindrome(String s) {
+        int i=0,j=s.length()-1;
+        while(i<j){
+            while(i<j && !Character.isAlphabetic(s.charAt(i)) && !Character.isDigit(s.charAt(i))) i++;
+            while(i<j && !Character.isAlphabetic(s.charAt(j)) && !Character.isDigit(s.charAt(j))) j--;
+            if(i<j){
+            	
+                if(s.charAt(i)==s.charAt(j) || (Character.isAlphabetic(s.charAt(i)) && Character.isAlphabetic(s.charAt(j)) &&((s.charAt(i)-s.charAt(j)=='A'-'a') || s.charAt(i)-s.charAt(j)=='a'-'A'))){
+                    i++;
+                    j--;
+                }else return false;
+            }
+        }
+        return true;
+    }
+    /*1025. Divisor Game
+     * Alice 和 Bob玩游戏，他们轮流对N进行如下操作
+     * 进行如下操作
+     * 选择一个能整除N的数x，即N%x==0，令N=N-x
+     * Alice先开始开始操作
+     * 到轮到某一方N为1时，则该方失败*/
+    public boolean divisorGame(int N) {
+        return N%2==0;
+    }
+    /*121. Best Time to Buy and Sell Stock
+     * 给定一个数组prices，表示股票每天的价格
+     * 至多买卖一次，求能获得的最大利润*/
+    public int maxProfit(int[] prices) {
+        int max = 0;
+        if(prices.length==0)
+            return 0;
+        int maxn = prices[0],minn = prices[0];
+        for(int i=1;i<prices.length;i++){
+            if(minn>prices[i]){
+                maxn = prices[i];
+                minn = prices[i];
+            }
+            if(prices[i]>maxn){
+                maxn = prices[i];
+                if(maxn-minn>max)
+                    max = maxn-minn;
+            }
+        }
+        return max;
+    }
+    /*931. Minimum Falling Path Sum
+     * 最小下降和
+     * 给定一个二维数组，从第一行的元素开始，每一行都选一个元素，
+     * 但下一行的元素必须在上一行元素列加减1的范围内*/
+    public int minFallingPathSum(int[][] A) {
+        int m = A.length,n = A[0].length;
+        int cur[] = new int[n];
+        int i,j;
+        for(j=0;j<n;j++)
+            cur[j] = A[0][j];
+        for(i=1;i<m;i++){
+            int next[] = new int[n];
+            for(j=0;j<n;j++){
+                next[j] = cur[j];
+                if(j>0 && cur[j-1]<next[j])
+                    next[j] = cur[j-1];
+                if(j<n-1 && cur[j+1]<next[j])
+                    next[j] = cur[j+1];
+                next[j] += A[i][j];
+            }
+            cur = next;
+        }
+        int min = cur[0];
+        for(i=1;i<n;i++)
+            if(cur[i]<min)
+                min = cur[i];
+        return min;
+    }
+    /*198. House Robber
+     * 有个强盗要抢劫一条街，
+     * 如果他抢劫了相邻的两户人家，则他会被警察抓住
+     * 在不被抓住的情况下，求他能抢到的最大金币数
+     * */
+    public int rob(int[] nums) {
+        if(nums.length==0)
+            return 0;
+        if(nums.length==1)
+            return nums[0];
+        int n = nums.length;
+        int an=0,an1,an2,i;
+        an2 = 0;
+        an1 = nums[0];
+        for(i=1;i<n;i++){
+            if(nums[i]+an2>an1)
+                an = nums[i]+an2;
+            else
+                an = an1;
+            an2 = an1;
+            an1 = an;
+        }
+        return an;
+    }
+    /*983. Minimum Cost For Tickets
+     * 车票按三种方式卖，用costs表示
+     * costs[0]表示1-day pass需要的钱
+     * costs[1]表示7-day pass需要的钱，即连续7天交通费
+     * costs[2]表示30-day pass需要的钱，即连续30天的交通所需的钱
+     * 现在需要在数组days中的这些天里去旅游，求需要的最小交通费*/
+    public int mincostTickets(int[] days, int[] costs) {
+        if(days.length==0)
+            return 0;
+        int n = days.length,i,j;
+        int minCost[] = new int[n+1];
+        if(costs[2]<costs[1]) costs[1] = costs[2];
+        if(costs[1]<costs[0]) costs[0] = costs[1];
+        minCost[0] = 0;
+        for(i=0;i<n;i++){
+            minCost[i+1] = minCost[i] + costs[0];
+            for(j=i-1;j>=0 && days[i]-days[j]<=6;j--)
+                if(minCost[j]+costs[1]<minCost[i+1])
+                     minCost[i+1] = minCost[j]+costs[1];
+            for(;j>=0 && days[i]-days[j]<=29;j--)
+                if(minCost[j]+costs[2]<minCost[i+1])
+                     minCost[i+1] = minCost[j]+costs[2];
+        }
+        return minCost[n];
+    }
+    /*64. Minimum Path Sum
+     * 给定一个mxn的非零数组，求从左上到右下的最小路径长度
+     * 只能向下或者向右*/
+    public int minPathSum(int[][] grid) {
+        int m = grid.length,n = grid[0].length;
+        int minSum[][] = new int[m][n];
+        int i,j;
+        minSum[0][0] = grid[0][0];
+        for(i=1;i<m;i++)
+            minSum[i][0] = minSum[i-1][0] + grid[i][0];
+        for(j=1;j<n;j++)
+            minSum[0][j] = minSum[0][j-1]+grid[0][j];
+        for(i=1;i<m;i++){
+            for(j=1;j<n;j++){
+                if(minSum[i-1][j]<minSum[i][j-1])
+                    minSum[i][j] = minSum[i-1][j];
+                else
+                    minSum[i][j] = minSum[i][j-1];
+                minSum[i][j] += grid[i][j];
+            }
+        }
+        return minSum[m-1][n-1];
+    }
     public static void main(String[] args) {
         LeetCode4 test = new LeetCode4();
+        
+        
+        System.out.println(9%1==0);
+        
+        System.out.println(test.isPalindrome("0P"));
     	int nums[] = {3,2,1,5,6,4};
     	System.out.println(test.findKthLargest(nums, 2));
         
