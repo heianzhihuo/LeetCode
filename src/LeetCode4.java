@@ -1,6 +1,8 @@
 import java.util.*;
 import java.util.Scanner;
 
+import org.omg.CORBA.PUBLIC_MEMBER;
+
 
 public class LeetCode4 {
 	
@@ -881,6 +883,87 @@ public class LeetCode4 {
         }
         return minSum[m-1][n-1];
     }
+    /* 62. Unique Paths
+     * 从mxn的网格的左上角到右下角的的路径数
+     * 只能向下和向右走*/
+    public int uniquePaths(int m, int n) {
+        if(m==1 || n==1)
+            return 1;
+        int a = m+n-2,b;
+        long sum = 1;
+        if(m>n)
+            b = n-1;
+        else b = m-1;
+        for(int i=0;i<b;i++)
+            sum = (sum*(a-i)/(i+1));
+        return (int)sum;
+    }
+    /*63. Unique Paths II
+     * mxn的网格中，部分位置有障碍不能通过，求所有路径数*/
+    public int uniquePathsWithObstacles(int[][] obstacleGrid) {
+        int m = obstacleGrid.length,n = obstacleGrid[0].length;
+        int i,j;
+        int path[] = new int[n];
+        for(j=0;j<n;j++)
+            if(obstacleGrid[0][j]==1)
+                break;
+            else
+                path[j] = 1;
+        int k;
+        for(k=0;k<m && obstacleGrid[k][0]==0;k++);
+        for(i=1;i<m;i++){
+            path[0] = i<k?1:0;
+            for(j=1;j<n;j++){
+                if(obstacleGrid[i][j]==1)
+                    path[j] = 0;
+                else
+                    path[j] += path[j-1];
+            }
+        }
+        return path[n-1];
+    }
+    /*980. Unique Paths III
+     * 从起点开始，访问所有被阻塞的网格后回到终点的路径数
+     * 1表示起点，2表示终点，0表示空白方格，-1表示阻塞方格*/
+    public int uniquePathsIII(int[][] grid) {
+        count = 0;
+        int m = grid.length,n = grid[0].length;
+        int i,j,x=-1,y=-1;
+        int left = 0;
+        for(i=0;i<m;i++)
+            for(j=0;j<n;j++)
+                if(grid[i][j]==0)
+                    left++;
+                else if(grid[i][j]==1){
+                    x=i;y=j;
+                }
+        grid[x][y] = 0;
+        visit(grid,x,y,m,n,left+1);    
+        return count;
+    }
+    int count;
+    public void visit(int[][] grid,int x,int y,int m,int n,int left){
+        if(x<0 || x>=m || y<0 || y>=n)
+            return;
+        if(grid[x][y]==2){
+            if(left==0)
+                count++;
+            return;
+        }
+        if(left==0)
+            return;
+        if(grid[x][y]!=0)
+            return;
+        grid[x][y] = 3;
+        left--;
+        visit(grid,x-1,y,m,n,left);
+        visit(grid,x+1,y,m,n,left);
+        visit(grid,x,y-1,m,n,left);
+        visit(grid,x,y+1,m,n,left);
+        grid[x][y] = 0;
+        left++;
+    }
+    
     public static void main(String[] args) {
         LeetCode4 test = new LeetCode4();
         
