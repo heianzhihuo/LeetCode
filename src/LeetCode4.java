@@ -982,22 +982,41 @@ public class LeetCode4 {
     /*115. Distinct Subsequences
      * 在字符串S中，有多少字串和字符串T相同*/
     public int numDistinct(String s, String t) {
-        int m = s.length(),n = t.length();
-        int dp[][] = new int[m+1][n+1];
+    	//一维数组
+    	int m = s.length(),n = t.length();
+        int dp[] = new int[m+1];
         int i,j;
-        for(i=0;i<=m;i++)
-            dp[i][0] = 1;
-        for(j=1;j<=n;j++)
-            for(i=j;i<=m;i++)
-                if(s.charAt(i-1)==t.charAt(j-1))
-                    dp[i][j] = dp[i-1][j-1]+dp[i-1][j];
+        for(j=0;j<=m;j++)
+            dp[j] = 1;
+        for(i=1;i<=n;i++){
+            int a = dp[i-1];
+            dp[i-1] = 0;
+            for(j=i;j<=m;j++){
+                int b = dp[j];
+                if(s.charAt(j-1)==t.charAt(i-1))
+                    dp[j] = dp[j-1]+a;
                 else
-                    dp[i][j] = dp[i-1][j];
-        return dp[m][n];
+                    dp[j] = dp[j-1];
+                a = b;
+            }
+        }
+        return dp[m];
+        //二维数组
+//        int m = s.length(),n = t.length();
+//        int dp[][] = new int[m+1][n+1];
+//        int i,j;
+//        for(i=0;i<=m;i++)
+//            dp[i][0] = 1;
+//        for(j=1;j<=n;j++)
+//            for(i=j;i<=m;i++)
+//                if(s.charAt(i-1)==t.charAt(j-1))
+//                    dp[i][j] = dp[i-1][j-1]+dp[i-1][j];
+//                else
+//                    dp[i][j] = dp[i-1][j];
+//        return dp[m][n];
     }
     public static void main(String[] args) {
         LeetCode4 test = new LeetCode4();
-        
         
         System.out.println(9%1==0);
         
