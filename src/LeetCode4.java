@@ -1015,8 +1015,25 @@ public class LeetCode4 {
 //                    dp[i][j] = dp[i-1][j];
 //        return dp[m][n];
     }
+    
+    public boolean isScramble(String s1, String s2) {
+        if(s1.length()!=s2.length())
+            return false;
+        int n = s1.length();
+        if(n==1) return s1.charAt(0)==s2.charAt(0);
+        int i;
+        for(i=1;i<n;i++){
+            if(isScramble(s1.substring(0,i),s2.substring(0,i)) && isScramble(s1.substring(i,n),s2.substring(i,n)))
+                return true;
+            if(isScramble(s1.substring(0,i),s2.substring(n-i,n)) && isScramble(s1.substring(i,n),s2.substring(0,n-i)))
+                return true;
+        }
+        return false;
+    }
     public static void main(String[] args) {
         LeetCode4 test = new LeetCode4();
+        
+        System.out.println(test.isScramble("abc", "bca"));
         
         System.out.println(9%1==0);
         
