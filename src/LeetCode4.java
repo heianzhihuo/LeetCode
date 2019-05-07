@@ -963,7 +963,38 @@ public class LeetCode4 {
         grid[x][y] = 0;
         left++;
     }
-    
+    /*120. Triangle
+     * 给定一个三角形，求从三角形顶部到底部的最小路径长度，每一步移动只能到下一层的相邻位置*/
+    public int minimumTotal(List<List<Integer>> triangle) {
+        int n = triangle.size();
+        if(n==0)
+            return 0;
+        int i,j;
+        int cur[] = new int[n];
+        for(i=0;i<n;i++)
+            cur[i] = triangle.get(n-1).get(i);
+        for(i=n-2;i>=0;i--){
+            for(j=0;j<=i;j++)
+                cur[j] = (cur[j]<cur[j+1]?cur[j]:cur[j+1]) + triangle.get(i).get(j);
+        }
+        return cur[0];
+    }
+    /*115. Distinct Subsequences
+     * 在字符串S中，有多少字串和字符串T相同*/
+    public int numDistinct(String s, String t) {
+        int m = s.length(),n = t.length();
+        int dp[][] = new int[m+1][n+1];
+        int i,j;
+        for(i=0;i<=m;i++)
+            dp[i][0] = 1;
+        for(j=1;j<=n;j++)
+            for(i=j;i<=m;i++)
+                if(s.charAt(i-1)==t.charAt(j-1))
+                    dp[i][j] = dp[i-1][j-1]+dp[i-1][j];
+                else
+                    dp[i][j] = dp[i-1][j];
+        return dp[m][n];
+    }
     public static void main(String[] args) {
         LeetCode4 test = new LeetCode4();
         
