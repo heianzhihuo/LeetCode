@@ -1015,25 +1015,62 @@ public class LeetCode4 {
 //                    dp[i][j] = dp[i-1][j];
 //        return dp[m][n];
     }
-    
+    /*87. Scramble String
+     * 给定两个字符串s1，用树表示这两个字符串
+     * 如果可以通过交换树的节点来得到s2，则这个字符串s1和s2是Scramble*/
     public boolean isScramble(String s1, String s2) {
         if(s1.length()!=s2.length())
             return false;
         int n = s1.length();
-        if(n==1) return s1.charAt(0)==s2.charAt(0);
-        int i;
-        for(i=1;i<n;i++){
-            if(isScramble(s1.substring(0,i),s2.substring(0,i)) && isScramble(s1.substring(i,n),s2.substring(i,n)))
-                return true;
-            if(isScramble(s1.substring(0,i),s2.substring(n-i,n)) && isScramble(s1.substring(i,n),s2.substring(0,n-i)))
-                return true;
-        }
-        return false;
+        boolean dp[][][] = new boolean[n][n][n+1];
+        int i,j,k,d;
+        for(i=0;i<n;i++)
+            for(j=0;j<n;j++)
+                if(s1.charAt(i)==s2.charAt(j))
+                    dp[i][j][1] = true;
+        for(k=2;k<=n;k++)
+            for(i=0;i+k<=n;i++)
+                for(j=0;j+k<=n;j++)
+                    for(d=1;d<k;d++)
+                        if((dp[i][j][d] && dp[i+d][j+d][k-d])||(dp[i][j+k-d][d] && dp[i+d][j][k-d])){
+                            dp[i][j][k] = true;
+                            break;
+                        }
+        return dp[0][0][n];
+        
+//        if(n==1) return s1.charAt(0)==s2.charAt(0);
+//        int i;
+//        for(i=1;i<n;i++){
+//            if(isScramble(s1.substring(0,i),s2.substring(0,i)) && isScramble(s1.substring(i,n),s2.substring(i,n)))
+//                return true;
+//            if(isScramble(s1.substring(0,i),s2.substring(n-i,n)) && isScramble(s1.substring(i,n),s2.substring(0,n-i)))
+//                return true;
+//        }
+//        return false;
     }
+    /*392. Is Subsequence
+     * 判断字符串s是否是字符串t的子串*/
+    public boolean isSubsequence(String s, String t) {
+        int n = s.length();
+        int m = t.length();
+        if(n>m)
+            return false;
+        int i;
+        int index = -1;
+        for(i=0;i<n;i++){
+            int newindex = t.indexOf(String.valueOf(s.charAt(i)),index+1);
+            if(newindex==-1 || newindex<index)
+                return false;
+            else
+                index = newindex;
+        }
+        return true;
+    }
+    
     public static void main(String[] args) {
         LeetCode4 test = new LeetCode4();
-        
-        System.out.println(test.isScramble("abc", "bca"));
+        System.out.println(test.isSubsequence("abc", "ahbgdc"));
+        System.out.println(test.isScramble("great", "rgeat"));
         
         System.out.println(9%1==0);
         
