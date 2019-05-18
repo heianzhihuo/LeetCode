@@ -278,9 +278,135 @@ public class LeetCode4 {
         return res;
     }
     
+    /*942. DI String Match
+     * 给定一个数组S，生成一个1-N的排列A
+     * 使得 ifS[i]=='I',then A[i]<A[i+1]
+     * ifS[i]=='D' then  A[i]>A[i+1] 
+     * 思路很简单，就是如果S[0]=='I' 则A[0] = 0
+     * 否则，A[0]= N;
+     * */
+    public int[] diStringMatch(String S) {
+        int i,j,k;
+        i = 0;
+        j = S.length();
+        int result[] =new int[j+1];
+        for(k=0;k<S.length();k++)
+            if(S.charAt(k)=='I'){
+                result[k] = i;
+                i++;
+            }else{
+                result[k] = j;
+                j--;
+            }
+        result[k] = i;
+        return result;
+    }
+    
+    /*279. Perfect Squares
+     * 讲n拆分成最少数目的完全平方数的和
+     * 动态规划*/
+    public int numSquares(int n) {
+        int result[] = new int[n+1];
+        int i,j;
+        result[0] = 0;
+        for(i=1;i<=n;i++){
+            int min = i;
+            for(j=2;j*j<=i;j++)
+                if(result[i-j*j]+1<min)
+                    min = Math.min(result[i-j*j]+1,min);
+            result[i] = min;
+        }
+        return result[n];
+    }
+    /*310. Minimum Height Trees
+     * 给定一个无环无向图，选择一个顶点作为根节点，使得树的高度最小
+     * 思路：找到最长的路径，以这个路径的中点作为根
+     * 最长路径的求解：先找到离一个节点最远的节点，然后求以最远节点开始的路径
+     * 
+     * 这题就是找最中间的两个点，还有一种思路是一直把叶节点删除，
+     * 直到图中剩1个或者2个点为止
+     * */
+    public List<Integer> findMinHeightTrees(int n, int[][] edges) {
+        adj = new List[n];
+        int i;
+        for(i=0;i<n;i++)
+            adj[i] = new ArrayList<>();
+        for(i=0;i<edges.length;i++){
+            adj[edges[i][0]].add(edges[i][1]);
+            adj[edges[i][1]].add(edges[i][0]);
+        }
+        visited = new boolean[n];
+        List<Integer> path = longestPath(0);
+        visited = new boolean[n];
+        List<Integer> longepath = longestPath(path.get(0));
+        List<Integer> result = new ArrayList<>();
+        i = longepath.size();
+        if(i%2==0){
+            result.add(longepath.get(i/2));
+            result.add(longepath.get(i/2-1));
+        }else
+            result.add(longepath.get(i/2));
+        return result;
+        
+    }
+    List<Integer>[] adj;
+    boolean []visited;
+    List<Integer> longestPath(int v){
+        List<Integer> result=null;
+        visited[v] = true;
+        for(int c:adj[v])
+            if(!visited[c]){
+                List<Integer> tmp = longestPath(c);
+                if(result==null || result.size()<tmp.size())
+                    result = tmp;
+            }
+        if(result==null)
+            result = new ArrayList<>();
+        result.add(v);
+        return result;        
+    }
+    
+    /*207. Course Schedule
+     * 课程安排问题：拓扑排序问题
+     * 给定标签0-n-1的n门课程，其中[0,1]表示，1是0的先修课*/
+    public boolean canFinish(int numCourses, int[][] prerequisites) {
+        int n = numCourses;
+        adj = new List[n];
+        int i;
+        for(i=0;i<n;i++)
+            adj[i] = new ArrayList<>();
+        for(i=0;i<prerequisites.length;i++)
+            adj[prerequisites[i][1]].add(prerequisites[i][0]);
+        visited = new boolean[n];//用于判断课程是否已经完成
+        finished = new boolean[n];//
+        for(i=0;i<n;i++){
+            if(DFS(i))
+                return false;
+        }
+        return true;
+    }
+    boolean []finished;
+    boolean DFS(int v){
+        if(finished[v])
+            return false;
+        else if(visited[v])
+            return true;
+        visited[v] = true;
+        for(int c:adj[v])
+            if(DFS(c))
+                return true;
+        finished[v] = true;
+        return false;
+    }
+    
     public static void main(String[] args) {
         LeetCode4 test = new LeetCode4();
     	int A[] = {2147483647,2147483647,2147483647,2147483647,2147483647,2147483647};
+    	int prerequisites[][] = {{0,1},{0,2},{1,2}};
+    	System.out.println(test.canFinish(3, prerequisites));
+    	
+    	
+    	
     	System.out.println(test.reversePairs(A));
     	for(int x:A)
     		System.out.println(x);
