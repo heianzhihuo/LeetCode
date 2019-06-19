@@ -15,4 +15,26 @@ public class Singleton {
 		}
 		return uniqueInstance;
 	}
+	
+	{
+		System.out.println("非静态代码块执行");
+	}
+	
+	static{
+		System.out.println("静态代码块执行");
+	}
+	
+	final void Hello() {
+		System.out.println("Hello World!");
+	}
+	
+	void Hello(String greet) {
+		System.out.println("Hello" + greet);
+	}
+	
+	public static void main(String[] args) {
+		new Singleton();
+		new Singleton();
+	}
+	
 }

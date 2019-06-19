@@ -13,7 +13,6 @@ public abstract class Semaphore {
 		while (value==0)
 			wait();
 		value--;
-			
 	}
 	
 	public final synchronized void Vc() {
@@ -34,4 +33,6 @@ public abstract class Semaphore {
 	public String toString() {
 		return ".value="+value;
 	}
+	
+
 }
