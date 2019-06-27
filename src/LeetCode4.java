@@ -1,10 +1,44 @@
 import java.util.*;
-import java.util.Scanner;
-
-import org.omg.CORBA.PUBLIC_MEMBER;
-
 
 public class LeetCode4 {
+	
+	/**
+	 * 最短公共超串
+	 * */
+	public String shortestCommonSupersequence(String str1, String str2) {
+        int n1 = str1.length();
+        int n2 = str2.length();
+        if(n1==0 || n2==0)
+            return str1+str2;
+        char char1[] = str1.toCharArray();
+        char char2[] = str2.toCharArray();
+        int dp[][] = new int[n1+1][n2+1];
+        int i,j;
+        for(i=0;i<n1;i++)
+            for(j=0;j<n2;j++){
+                dp[i+1][j+1] = Math.max(dp[i][j+1],dp[i+1][j]);
+                if(char1[i]==char2[j])
+                dp[i+1][j+1] = Math.max(dp[i+1][j+1],dp[i][j]+1);  
+            }
+        StringBuilder sb = new StringBuilder();
+        i = n1;j = n2;
+        char ch;
+        while(i>0 || j>0){
+            if(i==0 || (j>0 && dp[i][j]==dp[i][j-1])){
+                j--;
+                ch = char2[j];
+            }else if(j==0 || (i>0 && dp[i][j]==dp[i-1][j])){
+                i--;
+                ch = char1[i];
+            }else{
+                i--;
+                j--;
+                ch = char1[i];
+            }
+            sb.append(ch);
+        }
+        return sb.reverse().toString();   
+    }
 	
 	class TreeNode{
 		TreeNode left=null,right=null;
@@ -1188,11 +1222,131 @@ public class LeetCode4 {
         return true;
     }
     
+    
+    public int distinctSubseqII(String S) {
+        int n = S.length();
+        if(n<=1)
+            return n;
+        int ret = 0;
+        int mod = 1000000007;
+        List<Integer> current = new ArrayList<>();
+        char chars[] = S.toCharArray();
+        current.add(-1);
+        for(int i=0;i<n;i++){
+            List<Integer> next = new ArrayList<>();
+            for(int j:current){
+                boolean []flag = new boolean[26];
+                for(int k=j+1;k<n;k++)
+                    if(!flag[chars[k]-'a']){
+                        next.add(k);
+                        flag[chars[k]-'a'] = true;
+                    }
+            }
+            ret = (ret+next.size())%mod;
+            current = next;
+        }
+        return ret;
+    }
+    
+
+    public int minStickers(String[] stickers, String target) {
+        if(stickers.length==0)
+            return -1;
+        HashMap<Character,Integer> tar = new HashMap<>();
+        for(int i=0;i<target.length();i++){
+            char ch = target.charAt(i);
+            tar.put(ch,tar.getOrDefault(ch,0)+1);
+        }
+        List<HashMap<Character,Integer>> table = new ArrayList<>();
+        for(String str:stickers){
+            HashMap<Character,Integer> temp = new HashMap<>();
+            for(int i=0;i<str.length();i++){
+                char ch = str.charAt(i);
+                temp.put(ch,temp.getOrDefault(ch,0)+1);
+            }
+            table.add(temp);
+        }
+        HashSet<HashMap<Character,Integer>> cur = new HashSet<>();
+        cur.add(tar);
+        int ret = 0;
+        while(!cur.isEmpty()){
+            HashSet<HashMap<Character,Integer>> next = new HashSet<>();
+            ret++;
+            for(HashMap<Character,Integer> temp:cur){
+                for(HashMap<Character,Integer> word:table){
+                    HashMap<Character,Integer> sum = sub(temp, word);
+                    if(!sum.equals(temp))
+                        next.add(sum);
+                    if(sum.isEmpty())
+                    	return ret;
+                }
+            }
+            cur = next;
+        }
+        return -1;
+    }
+    
+    HashMap<Character,Integer> sub(HashMap<Character,Integer> a,HashMap<Character,Integer> b){
+    	HashMap<Character,Integer> result = new HashMap<>();
+    	for(char c:a.keySet()) {
+    		int z = a.get(c)-b.getOrDefault(c,0);
+    		if(z>0)
+    			result.put(c,z);
+    	}
+    	return result;
+    }
+    
+    /**/
+    public int findRotateSteps(String ring, String key) {
+        nn = ring.length();
+        char chs[] = ring.toCharArray();
+        List<Integer> pos[] = new List[26];
+        for(int i=0;i<26;i++)
+            pos[i] = new ArrayList<>();
+        for(int i=0;i<n;i++)
+            pos[chs[i]-'a'].add(i);
+        HashMap<Integer,Integer> cur = new HashMap<>();
+        cur.put(0,0);
+        chs = key.toCharArray();
+        for(int i=0;i<chs.length;i++){
+            HashMap<Integer,Integer> next = new HashMap<>();
+            for(int x:pos[chs[i]-'a']){
+                next.put(x,Integer.MAX_VALUE);
+                for(int y:cur.keySet()){
+                    int t = cur.get(y)+distance(x,y);
+                    if(t<next.get(x))
+                        next.put(x,t);
+                }
+            }
+            cur = next;
+        }
+        int ret = Integer.MAX_VALUE;
+        for(int c:cur.values())
+            if(c<ret) ret = c;
+        return ret+key.length();
+    }
+    int nn;
+    int distance(int a,int b){
+        int z = Math.abs(a-b);
+        return Math.min(z,nn-z);
+    }
+    
     public static void main(String[] args) {
         LeetCode4 test = new LeetCode4();
 //        LeetCode4 test = new LeetCode4();
-    	int A[] = {2147483647,2147483647,2147483647,2147483647,2147483647,2147483647};
+    		
+        String[] stickers = {"with","example","science"};
+        String target = "thehat";
+        System.out.println(test.minStickers(stickers, target));
+        
+        
+        System.out.println(test.distinctSubseqII("pcrdhwdxmqdznbenhwjsenjhvulyve"));
+        
+        
+        
+        int A[] = {2147483647,2147483647,2147483647,2147483647,2147483647,2147483647};
     	int prerequisites[][] = {{0,1},{0,2},{1,2}};
+    	
     	System.out.println(test.canFinish(3, prerequisites));
         
         System.out.println(test.isSubsequence("abc", "ahbgdc"));
